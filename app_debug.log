@@ -1,0 +1,17 @@
+[2025-07-23 10:05:19] Aplicação iniciada.
+[2025-07-23 10:05:20] Verificação de privilégios: Usuário Padrão
+[2025-07-23 10:05:21] Tentando reiniciar como administrador: c:\Users\Davi Santos\AppData\Local\Programs\Python\Python313\python.exe D:\Vscode\Windows teste\windows_version\main.py 
+[2025-07-23 10:05:22] Solicitação de privilégios enviada. Encerrando processo atual.
+[2025-07-23 10:05:22] Reiniciando como administrador. Encerrando processo atual.
+[2025-07-23 10:05:22] Aplicação iniciada.
+[2025-07-23 10:05:23] Verificação de privilégios: Administrador
+[2025-07-23 10:05:23] Importando MainWindow e iniciando a aplicação.
+[2025-07-23 10:06:39] Aplicação iniciada.
+[2025-07-23 10:06:40] Verificação de privilégios: Usuário Padrão
+[2025-07-23 10:06:41] Tentando reiniciar como administrador: C:\Users\Davi Santos\AppData\Local\Programs\Python\Python313\python.exe d:\Vscode\Windows teste\windows_version\main.py 
+[2025-07-23 10:06:42] Solicitação de privilégios enviada. Encerrando processo atual.
+[2025-07-23 10:06:42] Reiniciando como administrador. Encerrando processo atual.
+[2025-07-23 10:06:42] Aplicação iniciada.
+[2025-07-23 10:06:42] Verificação de privilégios: Administrador
+[2025-07-23 10:06:42] Importando MainWindow e iniciando a aplicação.
+[2025-07-23 10:11:27] Aplicação encerrada normalmente.

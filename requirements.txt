@@ -1,0 +1,33 @@
+# Dependências para a aplicação de Diagnóstico de Hardware
+# Para instalar: pip install -r requirements.txt
+
+# Interface gráfica (geralmente já incluído no Python)
+# tkinter
+
+# Processamento de imagens
+Pillow>=9.0.0
+
+# Visão computacional para webcam
+opencv-python>=4.5.0
+
+# Áudio
+pyaudio>=0.2.11
+
+# Captura de eventos de teclado e mouse
+pynput>=1.7.0
+
+# Computação numérica
+numpy>=1.21.0
+
+# Informações do sistema (opcional mas recomendado)
+psutil>=5.8.0
+
+# Informações do processador (opcional)
+py-cpuinfo>=8.0.0
+
+# Windows Management Instrumentation (opcional, apenas Windows)
+WMI>=1.5.1; sys_platform == "win32"
+
+# Para build do executável (apenas para desenvolvimento)
+pyinstaller>=5.0.0
+
