@@ -231,14 +231,15 @@ O script `build_exe.py` automatiza todo o processo:
 - Gera instalador e documentação
 
 ## Versão
-**2.0** - Versão para Windows (Refatorada do Linux)
+**1.0** - Versão para Windows 
 
 ## Licença
 © 2024 - Ferramenta de Diagnóstico de Hardware
-
+Davi Santos
+Analista Tecnico 
 ---
 
 ## Suporte
-Para problemas técnicos complexos, consulte um especialista em hardware.
+
 Esta ferramenta é destinada a diagnósticos básicos e identificação de problemas.
 
