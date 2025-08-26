@@ -200,70 +200,148 @@ class HardwareInfo:
         return result
     
     def get_disk_info(self):
-        """Obtém informações dos discos."""
+        """Obtém informações dos discos, filtrando por tipos internos (HDD/SSD/M.2) e excluindo USBs."""
         result = []
-        
+    
         if not self.is_windows:
             return result
         
         try:
-            # Executa o comando para obter informações dos discos físicos
-            output = self._run_command(["wmic", "diskdrive", "get", "model,size,mediatype"])
+            # Adiciona 'interfaceType' para ajudar na filtragem de USBs
+            output = self._run_command(["wmic", "diskdrive", "get", "model,size,mediatype,interfaceType"])
             
-            # Processa a saída
             lines = output.strip().split("\n")
             if len(lines) < 2:
                 return result
                 
             header = lines[0]
             
-            # Determina os índices das colunas
-            model_index = header.lower().find("model")
-            size_index = header.lower().find("size")
-            mediatype_index = header.lower().find("mediatype")
+            # Adiciona interfaceType aos índices
+            columns = [
+                ("model", header.lower().find("model")),
+                ("size", header.lower().find("size")),
+                ("mediatype", header.lower().find("mediatype")),
+                ("interfaceType", header.lower().find("interfaceType"))
+            ]
             
-            # Ordena os índices para extrair corretamente
-            indices = sorted([ 
-                (model_index, "model"), 
-                (size_index, "size"),
-                (mediatype_index, "mediatype")
-            ])
+            # Ordena pelos índices de coluna
+            columns.sort(key=lambda x: x[1])
             
             for line in lines[1:]:
                 if not line.strip():
                     continue
-                
+                    
                 disk_data = {}
-                for i, (index, key) in enumerate(indices):
-                    if index < 0:
+                # Extrai os valores baseado nas posições das colunas
+                for i, (key, start_index) in enumerate(columns):
+                    if start_index == -1:
                         continue
+                        
+                    # Encontra o fim da coluna atual
+                    end_index = None
+                    if i + 1 < len(columns):
+                        next_start = columns[i+1][1]
+                        if next_start > start_index:
+                            end_index = next_start
                     
-                    # Calcula o fim da coluna atual
-                    if i + 1 < len(indices):
-                        next_index = indices[i+1][0]
-                        end_index = next_index if next_index > index else len(line)
-                    else:
-                        end_index = len(line)
-                    
-                    # Extrai o valor
-                    value = line[index:end_index].strip()
+                    value = line[start_index:end_index].strip() if end_index else line[start_index:].strip()
                     disk_data[key] = value
-                
+
+                # Pula dispositivos USB baseados no interfaceType
+                if disk_data.get("interfaceType", "").lower() == "usb":
+                    continue
+                    
+                # Pula mídias removíveis/externas
+                mediatype = disk_data.get("mediatype", "").lower()
+                if any(x in mediatype for x in ["external", "removable"]):
+                    continue
+                    
+                # Filtra apenas tipos desejados (HDD/SSD/NVMe)
+                if not any(x in mediatype for x in ["hdd", "ssd", "nvme", "fixed"]) and \
+                   not any(x in disk_data.get("model", "").lower() for x in ["ssd", "nvme", "m.2"]):
+                    continue
+
                 try:
-                    # Converte o tamanho para GB
                     size_gb = round(int(disk_data.get("size", 0)) / (1024**3), 2)
-                    # Adiciona o disco à lista
                     result.append({
                         "model": disk_data.get("model", "Não disponível"),
                         "size": f"{size_gb:.2f} GB",
                         "type": disk_data.get("mediatype", "Não disponível")
                     })
-                except (ValueError, IndexError):
+                except (ValueError, TypeError):
                     continue
+                    
         except Exception as e:
             print(f"Erro ao obter informações dos discos: {e}")
-        
+            
         return result
+
+
+    # def get_disk_info(self):
+    #     """Obtém informações dos discos."""
+    #     result = []
+        
+    #     if not self.is_windows:
+    #         return result
+        
+    #     try:
+    #         # Executa o comando para obter informações dos discos físicos
+    #         output = self._run_command(["wmic", "diskdrive", "get", "model,size,mediatype", ])
+            
+    #         # Processa a saída
+    #         lines = output.strip().split("\n")
+    #         if len(lines) < 2:
+    #             return result
+                
+    #         header = lines[0]
+            
+    #         # Determina os índices das colunas
+    #         model_index = header.lower().find("model")
+    #         size_index = header.lower().find("size")
+    #         mediatype_index = header.lower().find("mediatype")
+            
+    #         # Ordena os índices para extrair corretamente
+    #         indices = sorted([ 
+    #             (model_index, "model"), 
+    #             (size_index, "size"),
+    #             (mediatype_index, "mediatype")
+    #         ])
+            
+    #         for line in lines[1:]:
+    #             if not line.strip():
+    #                 continue
+                
+    #             disk_data = {}
+    #             for i, (index, key) in enumerate(indices):
+    #                 if index < 0:
+    #                     continue
+                    
+    #                 # Calcula o fim da coluna atual
+    #                 if i + 1 < len(indices):
+    #                     next_index = indices[i+1][0]
+    #                     end_index = next_index if next_index > index else len(line)
+    #                 else:
+    #                     end_index = len(line)
+                    
+    #                 # Extrai o valor
+    #                 value = line[index:end_index].strip()
+    #                 disk_data[key] = value
+                
+    #             try:
+    #                 # Converte o tamanho para GB
+    #                 size_gb = round(int(disk_data.get("size", 0)) / (1024**3), 2)
+    #                 # Adiciona o disco à lista
+    #                 result.append({
+    #                     "model": disk_data.get("model", "Não disponível"),
+    #                     "size": f"{size_gb:.2f} GB",
+    #                     "type": disk_data.get("mediatype", "Não disponível")
+    #                 })
+    #             except (ValueError, IndexError):
+    #                 continue
+    #     except Exception as e:
+    #         print(f"Erro ao obter informações dos discos: {e}")
+        
+    #     return result
     
     def get_gpu_info(self):
         """Obtém informações da placa de vídeo."""
